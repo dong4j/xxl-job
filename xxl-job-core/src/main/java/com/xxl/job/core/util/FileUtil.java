@@ -83,7 +83,7 @@ public class FileUtil {
 
     }
 
-    public static List<String> loadFileLines(String fileName){
+    public static List<String> loadFileLines(String fileName) {
 
         List<String> result = new ArrayList<>();
 
@@ -94,15 +94,15 @@ public class FileUtil {
         }
 
         // read file
-        StringBuffer logContentBuffer = new StringBuffer();
-        int toLineNum = 0;
-        LineNumberReader reader = null;
+        StringBuffer     logContentBuffer = new StringBuffer();
+        int              toLineNum        = 0;
+        LineNumberReader reader           = null;
         try {
             //reader = new LineNumberReader(new FileReader(logFile));
             reader = new LineNumberReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
             String line = null;
-            while ((line = reader.readLine())!=null) {
-                if (line!=null && line.trim().length()>0) {
+            while ((line = reader.readLine()) != null) {
+                if (line != null && line.trim().length() > 0) {
                     result.add(line);
                 }
             }

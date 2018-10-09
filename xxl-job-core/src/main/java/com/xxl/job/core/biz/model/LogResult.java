@@ -15,9 +15,9 @@ public class LogResult implements Serializable {
         this.isEnd = isEnd;
     }
 
-    private int fromLineNum;
-    private int toLineNum;
-    private String logContent;
+    private int     fromLineNum;
+    private int     toLineNum;
+    private String  logContent;
     private boolean isEnd;
 
     public int getFromLineNum() {

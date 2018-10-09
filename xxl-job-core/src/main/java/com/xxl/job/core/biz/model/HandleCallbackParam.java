@@ -8,12 +8,13 @@ import java.io.Serializable;
 public class HandleCallbackParam implements Serializable {
     private static final long serialVersionUID = 42L;
 
-    private int logId;
+    private int  logId;
     private long logDateTim;
 
     private ReturnT<String> executeResult;
 
-    public HandleCallbackParam(){}
+    public HandleCallbackParam() {}
+
     public HandleCallbackParam(int logId, long logDateTim, ReturnT<String> executeResult) {
         this.logId = logId;
         this.logDateTim = logDateTim;
@@ -47,10 +48,10 @@ public class HandleCallbackParam implements Serializable {
     @Override
     public String toString() {
         return "HandleCallbackParam{" +
-                "logId=" + logId +
-                ", logDateTim=" + logDateTim +
-                ", executeResult=" + executeResult +
-                '}';
+               "logId=" + logId +
+               ", logDateTim=" + logDateTim +
+               ", executeResult=" + executeResult +
+               '}';
     }
 
 }

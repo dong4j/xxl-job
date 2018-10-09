@@ -13,10 +13,10 @@ public enum GlueTypeEnum {
     GLUE_NODEJS("GLUE(Nodejs)", true, "node", ".js"),
     GLUE_POWERSHELL("GLUE(PowerShell)", true, "powershell ", ".ps1");
 
-    private String desc;
+    private String  desc;
     private boolean isScript;
-    private String cmd;
-    private String suffix;
+    private String  cmd;
+    private String  suffix;
 
     private GlueTypeEnum(String desc, boolean isScript, String cmd, String suffix) {
         this.desc = desc;
@@ -41,8 +41,8 @@ public enum GlueTypeEnum {
         return suffix;
     }
 
-    public static GlueTypeEnum match(String name){
-        for (GlueTypeEnum item: GlueTypeEnum.values()) {
+    public static GlueTypeEnum match(String name) {
+        for (GlueTypeEnum item : GlueTypeEnum.values()) {
             if (item.name().equals(name)) {
                 return item;
             }
