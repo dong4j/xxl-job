@@ -390,4 +390,10 @@ public class XxlJobServiceImpl implements XxlJobService {
         return new ReturnT<>(result);
     }
 
+    @Override
+    public List<String> getJobHandlers() {
+
+        return null;
+    }
+
 }

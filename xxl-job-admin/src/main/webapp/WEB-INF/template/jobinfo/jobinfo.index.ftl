@@ -106,7 +106,7 @@
                         <label for="firstname" class="col-sm-2 control-label">${I18n.jobinfo_field_jobgroup}<font
                                 color="red">*</font></label>
                         <div class="col-sm-4">
-                            <select class="form-control" name="jobGroup">
+                            <select class="form-control" name="jobGroup" id="jobGroupSelect">
 		            			<#list JobGroupList as group>
                                     <option value="${group.id}" <#if jobGroup==group.id>selected</#if> >${group.title}</option>
 								</#list>
@@ -142,8 +142,12 @@
                             </select>
                         </div>
                         <label for="firstname" class="col-sm-2 control-label">JobHandler<font color="red">*</font></label>
-                        <div class="col-sm-4"><input type="text" class="form-control" name="executorHandler"
-                                                     placeholder="${I18n.system_please_input}JobHandler" maxlength="100"></div>
+                        <div class="col-sm-4">
+                            <select class="form-control" name="executorHandler" id="executorHandlerSelect">
+                                <option value="defalut" selected>请选择 JobHandler</option>
+                            </select>
+
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="firstname" class="col-sm-2 control-label">${I18n.jobinfo_field_executorBlockStrategy}<font

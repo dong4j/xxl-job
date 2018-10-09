@@ -1,6 +1,7 @@
 package com.xxl.job.core.log;
 
 import com.xxl.job.core.biz.model.LogResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,11 +11,15 @@ import java.util.Date;
 
 /**
  * store trigger log in each log-file
+ *
  * @author xuxueli 2016-3-12 19:25:12
  */
 public class XxlJobFileAppender {
 	private static Logger logger = LoggerFactory.getLogger(XxlJobFileAppender.class);
-	
+
+	/**
+	 * The constant contextHolder.
+	 */
 	// for JobThread (support log for child thread of job handler)
 	//public static ThreadLocal<String> contextHolder = new ThreadLocal<String>();
 	public static final InheritableThreadLocal<String> contextHolder = new InheritableThreadLocal<String>();
@@ -35,6 +40,12 @@ public class XxlJobFileAppender {
 	 */
 	private static String logBasePath = "/data/applogs/xxl-job/jobhandler";
 	private static String glueSrcPath = logBasePath.concat("/gluesource");
+
+	/**
+	 * Init log path.
+	 *
+	 * @param logPath the log path
+	 */
 	public static void initLogPath(String logPath){
 		// init
 		if (logPath!=null && logPath.trim().length()>0) {
@@ -54,9 +65,21 @@ public class XxlJobFileAppender {
 		}
 		glueSrcPath = glueBaseDir.getPath();
 	}
+
+	/**
+	 * Gets log path.
+	 *
+	 * @return the log path
+	 */
 	public static String getLogPath() {
 		return logBasePath;
 	}
+
+	/**
+	 * Gets glue src path.
+	 *
+	 * @return the glue src path
+	 */
 	public static String getGlueSrcPath() {
 		return glueSrcPath;
 	}
@@ -64,9 +87,9 @@ public class XxlJobFileAppender {
 	/**
 	 * log filename, like "logPath/yyyy-MM-dd/9999.log"
 	 *
-	 * @param triggerDate
-	 * @param logId
-	 * @return
+	 * @param triggerDate the trigger date
+	 * @param logId       the log id
+	 * @return string
 	 */
 	public static String makeLogFileName(Date triggerDate, int logId) {
 
@@ -88,8 +111,8 @@ public class XxlJobFileAppender {
 	/**
 	 * append log
 	 *
-	 * @param logFileName
-	 * @param appendLog
+	 * @param logFileName the log file name
+	 * @param appendLog   the append log
 	 */
 	public static void appendLog(String logFileName, String appendLog) {
 
@@ -137,7 +160,8 @@ public class XxlJobFileAppender {
 	/**
 	 * support read log-file
 	 *
-	 * @param logFileName
+	 * @param logFileName the log file name
+	 * @param fromLineNum the from line num
 	 * @return log content
 	 */
 	public static LogResult readLog(String logFileName, int fromLineNum){
@@ -193,7 +217,8 @@ public class XxlJobFileAppender {
 
 	/**
 	 * read log data
-	 * @param logFile
+	 *
+	 * @param logFile the log file
 	 * @return log line content
 	 */
 	public static String readLines(File logFile){

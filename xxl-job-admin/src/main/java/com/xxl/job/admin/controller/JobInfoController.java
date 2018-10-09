@@ -7,9 +7,11 @@ import com.xxl.job.admin.core.thread.JobTriggerPoolHelper;
 import com.xxl.job.admin.core.trigger.TriggerTypeEnum;
 import com.xxl.job.admin.dao.XxlJobGroupDao;
 import com.xxl.job.admin.service.XxlJobService;
+import com.xxl.job.core.biz.AdminBiz;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
+import com.xxl.job.core.handler.IJobHandler;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,16 +19,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * index controller
  *
  * @author xuxueli 2015-12-19 16:13:16
  */
+@Slf4j
 @Controller
 @RequestMapping("/jobinfo")
 public class JobInfoController {
@@ -62,6 +68,22 @@ public class JobInfoController {
                                         int jobGroup, String jobDesc, String executorHandler, String filterTime) {
 
         return xxlJobService.pageList(start, length, jobGroup, jobDesc, executorHandler, filterTime);
+    }
+
+    @RequestMapping("/handlers")
+    @ResponseBody
+    public ReturnT<List<String>> getJobHandlers(int jobGroupId) {
+        XxlJobGroup group   = xxlJobGroupDao.load(jobGroupId);
+        String      appName = group.getAppName();
+        Map<String, IJobHandler> map = AdminBiz.RELATIONSHIP_MAP.get(appName);
+        List<String> jobNames = new ArrayList<>();
+        if(map != null){
+            for (Map.Entry<String, IJobHandler> entry : map.entrySet()) {
+                log.error("name = {}, class = {}", entry.getKey(), entry.getValue());
+                jobNames.add(entry.getKey());
+            }
+        }
+        return new ReturnT<>(jobNames);
     }
 
     @RequestMapping("/add")

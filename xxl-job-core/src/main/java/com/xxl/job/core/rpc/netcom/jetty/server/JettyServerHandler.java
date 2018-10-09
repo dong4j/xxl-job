@@ -20,7 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 public class JettyServerHandler extends AbstractHandler {
 
     @Override
-    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void handle(String target,
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException {
 
         // invoke
         RpcResponse rpcResponse = doInvoke(request);
@@ -35,7 +38,6 @@ public class JettyServerHandler extends AbstractHandler {
         OutputStream out = response.getOutputStream();
         out.write(responseBytes);
         out.flush();
-
     }
 
     private RpcResponse doInvoke(HttpServletRequest request) {

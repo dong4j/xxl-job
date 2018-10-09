@@ -5,6 +5,7 @@ import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.core.biz.model.ReturnT;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public interface XxlJobService {
      * @param jobDesc         the job desc
      * @param executorHandler the executor handler
      * @param filterTime      the filter time
-     * @return map
+     * @return map map
      */
     Map<String, Object> pageList(int start, int length, int jobGroup, String jobDesc, String executorHandler, String filterTime);
 
@@ -70,7 +71,7 @@ public interface XxlJobService {
     /**
      * dashboard info
      *
-     * @return map
+     * @return map map
      */
     Map<String, Object> dashboardInfo();
 
@@ -82,5 +83,12 @@ public interface XxlJobService {
      * @return return t
      */
     ReturnT<Map<String, Object>> chartInfo(Date startDate, Date endDate);
+
+    /**
+     * 获取所有 handler
+     *
+     * @return the job handlers
+     */
+    List<String> getJobHandlers();
 
 }

@@ -5,10 +5,9 @@ import com.xxl.job.core.rpc.codec.RpcResponse;
 import com.xxl.job.core.rpc.netcom.NetComServerFactory;
 import com.xxl.job.core.rpc.serialize.HessianSerializer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>Company: 科大讯飞股份有限公司-四川分公司</p>
@@ -18,9 +17,8 @@ import javax.servlet.http.HttpServletRequest;
  * @email sjdong3@iflytek.com
  * @since 2018-10-09 11:57
  */
+@Slf4j
 public class RpcUtil {
-    private static Logger logger = LoggerFactory.getLogger(RpcUtil.class);
-
     public static RpcResponse getRpcResponse(HttpServletRequest request) {
         try {
             // deserialize request
@@ -34,7 +32,7 @@ public class RpcUtil {
             // invoke
             return NetComServerFactory.invokeService(rpcRequest, null);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             RpcResponse rpcResponse = new RpcResponse();
             rpcResponse.setError("Server-error:" + e.getMessage());
             return rpcResponse;

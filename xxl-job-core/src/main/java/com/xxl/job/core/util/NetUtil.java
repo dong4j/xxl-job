@@ -3,8 +3,8 @@ package com.xxl.job.core.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.io.*;
+import java.net.*;
 
 /**
  * net util
@@ -17,8 +17,8 @@ public class NetUtil {
     /**
      * find avaliable port
      *
-     * @param defaultPort
-     * @return
+     * @param defaultPort the default port
+     * @return int
      */
     public static int findAvailablePort(int defaultPort) {
         int portTmp = defaultPort;
@@ -43,8 +43,8 @@ public class NetUtil {
     /**
      * check port used
      *
-     * @param port
-     * @return
+     * @param port the port
+     * @return boolean
      */
     public static boolean isPortUsed(int port) {
         boolean used = false;
