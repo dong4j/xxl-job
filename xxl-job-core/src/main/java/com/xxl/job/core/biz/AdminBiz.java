@@ -3,7 +3,6 @@ package com.xxl.job.core.biz;
 import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.handler.IJobHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author xuxueli 2017-07-27 21:52:49
  */
 public interface AdminBiz {
-    Map<String, Map<String, IJobHandler>> RELATIONSHIP_MAP = new ConcurrentHashMap<>();
+    Map<String, List<String>> RELATIONSHIP_MAP = new ConcurrentHashMap<>();
 
     /**
      * The constant MAPPING.

@@ -1,7 +1,6 @@
 package com.xxl.job.core.rpc.netcom;
 
 import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.rpc.codec.RpcRequest;
 import com.xxl.job.core.rpc.codec.RpcResponse;
 import com.xxl.job.core.rpc.netcom.jetty.server.JettyServer;
@@ -10,6 +9,7 @@ import org.springframework.cglib.reflect.FastClass;
 import org.springframework.cglib.reflect.FastMethod;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,7 +28,7 @@ public class NetComServerFactory {
      * @param ip      the ip
      * @param appName the app name
      */
-    public void start(int port, String ip, String appName, Map<String, IJobHandler> jobHandlerRepository) {
+    public void start(int port, String ip, String appName, List<String> jobHandlerRepository) {
         server.start(port, ip, appName, jobHandlerRepository);
     }
 

@@ -169,9 +169,8 @@ public class XxlJobExecutor implements ApplicationContextAware {
      *
      * @param adminAddresses the admin addresses
      * @param accessToken    the access token
-     * @throws Exception the exception
      */
-    private static void initAdminBizList(String adminAddresses, String accessToken) throws Exception {
+    private static void initAdminBizList(String adminAddresses, String accessToken) {
         if (adminAddresses != null && adminAddresses.trim().length() > 0) {
             for (String address : adminAddresses.trim().split(",")) {
                 if (address != null && address.trim().length() > 0) {
@@ -202,16 +201,19 @@ public class XxlJobExecutor implements ApplicationContextAware {
      * @param ip          the ip
      * @param appName     the app name
      * @param accessToken the access token
-     * @throws Exception the exception
      */
-    private void initExecutorServer(int port, String ip, String appName, String accessToken) throws Exception {
+    private void initExecutorServer(int port, String ip, String appName, String accessToken) {
         // 未配置 port 时, 获取可用的端口, 默认 9999
         port = port > 0 ? port : NetUtil.findAvailablePort(9999);
         // start server, rpc-service, base on jetty
         NetComServerFactory.putService(ExecutorBiz.class, new ExecutorBizImpl());
         NetComServerFactory.setAccessToken(accessToken);
         // jetty + registry
-        serverFactory.start(port, ip, appName, jobHandlerRepository);
+        List<String> jobHandlers = new ArrayList<>();
+        for (Map.Entry<String, IJobHandler> entry : jobHandlerRepository.entrySet()) {
+            jobHandlers.add(entry.getKey());
+        }
+        serverFactory.start(port, ip, appName, jobHandlers);
     }
 
     private void stopExecutorServer() {

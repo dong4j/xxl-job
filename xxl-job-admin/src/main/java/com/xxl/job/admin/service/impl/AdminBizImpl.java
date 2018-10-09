@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -118,7 +117,7 @@ public class AdminBizImpl implements AdminBiz {
 
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
-        Map<String, IJobHandler> jobHandlerRepository = registryParam.getJobHandlerRepository();
+        List<String> jobHandlerRepository = registryParam.getJobHandlerRepository();
         if(jobHandlerRepository != null && jobHandlerRepository.size() > 0){
             AdminBiz.RELATIONSHIP_MAP.put(registryParam.getRegistryKey(), jobHandlerRepository);
         }

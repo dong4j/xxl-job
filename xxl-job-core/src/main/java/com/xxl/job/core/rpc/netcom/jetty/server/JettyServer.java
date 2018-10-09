@@ -2,7 +2,6 @@ package com.xxl.job.core.rpc.netcom.jetty.server;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.thread.ExecutorRegistryThread;
 import com.xxl.job.core.thread.TriggerCallbackThread;
 
@@ -15,7 +14,7 @@ import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -39,7 +38,7 @@ public class JettyServer {
      * @param ip      the ip
      * @param appName the app name
      */
-    public void start(final int port, final String ip, final String appName, final Map<String, IJobHandler> jobHandlerRepository) {
+    public void start(final int port, final String ip, final String appName, final List<String> jobHandlerRepository) {
         singleThreadPool = new ThreadPoolExecutor(1,
                                                   1,
                                                   0L,

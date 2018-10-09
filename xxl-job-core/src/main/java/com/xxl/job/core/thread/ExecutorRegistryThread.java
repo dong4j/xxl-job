@@ -7,10 +7,9 @@ import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.RegistryConfig;
 import com.xxl.job.core.executor.XxlJobExecutor;
-import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.util.IpUtil;
 
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -45,7 +44,7 @@ public class ExecutorRegistryThread extends Thread {
      * @param ip      the ip
      * @param appName the app name
      */
-    public void start(final int port, final String ip, final String appName, final Map<String, IJobHandler> jobHandlerRepository) {
+    public void start(final int port, final String ip, final String appName, final List<String> jobHandlerRepository) {
         // valid
         if (appName == null || appName.trim().length() == 0) {
             log.warn(">>>>>>>>>>> xxl-job, executor registry config fail, appName is null.");

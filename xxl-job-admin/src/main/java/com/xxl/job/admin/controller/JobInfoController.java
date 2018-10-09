@@ -11,7 +11,6 @@ import com.xxl.job.core.biz.AdminBiz;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
-import com.xxl.job.core.handler.IJobHandler;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -75,16 +73,7 @@ public class JobInfoController {
     public ReturnT<List<String>> getJobHandlers(int jobGroupId) {
         XxlJobGroup group   = xxlJobGroupDao.load(jobGroupId);
         if(group != null){
-            String      appName = group.getAppName();
-            Map<String, IJobHandler> map = AdminBiz.RELATIONSHIP_MAP.get(appName);
-            List<String> jobNames = new ArrayList<>();
-            if(map != null){
-                for (Map.Entry<String, IJobHandler> entry : map.entrySet()) {
-                    log.error("name = {}, class = {}", entry.getKey(), entry.getValue());
-                    jobNames.add(entry.getKey());
-                }
-            }
-            return new ReturnT<>(jobNames);
+            return new ReturnT<>(AdminBiz.RELATIONSHIP_MAP.get(group.getAppName()));
         }
         return new ReturnT<>(ReturnT.FAIL_CODE, "参数错误");
     }
