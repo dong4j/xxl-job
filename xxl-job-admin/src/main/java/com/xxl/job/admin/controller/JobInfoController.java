@@ -74,16 +74,19 @@ public class JobInfoController {
     @ResponseBody
     public ReturnT<List<String>> getJobHandlers(int jobGroupId) {
         XxlJobGroup group   = xxlJobGroupDao.load(jobGroupId);
-        String      appName = group.getAppName();
-        Map<String, IJobHandler> map = AdminBiz.RELATIONSHIP_MAP.get(appName);
-        List<String> jobNames = new ArrayList<>();
-        if(map != null){
-            for (Map.Entry<String, IJobHandler> entry : map.entrySet()) {
-                log.error("name = {}, class = {}", entry.getKey(), entry.getValue());
-                jobNames.add(entry.getKey());
+        if(group != null){
+            String      appName = group.getAppName();
+            Map<String, IJobHandler> map = AdminBiz.RELATIONSHIP_MAP.get(appName);
+            List<String> jobNames = new ArrayList<>();
+            if(map != null){
+                for (Map.Entry<String, IJobHandler> entry : map.entrySet()) {
+                    log.error("name = {}, class = {}", entry.getKey(), entry.getValue());
+                    jobNames.add(entry.getKey());
+                }
             }
+            return new ReturnT<>(jobNames);
         }
-        return new ReturnT<>(jobNames);
+        return new ReturnT<>(ReturnT.FAIL_CODE, "参数错误");
     }
 
     @RequestMapping("/add")

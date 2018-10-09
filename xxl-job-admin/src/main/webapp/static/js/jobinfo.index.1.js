@@ -445,9 +445,9 @@ $(function () {
 
   // update
   $("#job_list").on('click', '.update', function () {
-
     var id = $(this).parent('p').attr("id");
     var row = tableData['key' + id];
+    console.log(row);
 
     // base data
     $("#updateModal .form input[name='id']").val(row.id);
@@ -459,15 +459,41 @@ $(function () {
     $("#updateModal .form input[name='executorTimeout']").val(row.executorTimeout);
     $("#updateModal .form input[name='executorFailRetryCount']").val(row.executorFailRetryCount);
     $('#updateModal .form select[name=executorRouteStrategy] option[value=' + row.executorRouteStrategy + ']').prop('selected', true);
-    $("#updateModal .form input[name='executorHandler']").val(row.executorHandler);
+    // $("#updateModal .form input[name='executorHandler']").val(row.executorHandler);
+    console.log(row.executorHandler);
+    // 根据当前 jobGroupId 获取所有 jobHandler
+    var url = base_url + "/jobinfo/handlers";
+    var updateExecutorHandler = $("#executorHandlerSelectUpdate");
+    $.ajax({
+             type: 'POST',
+             url: url,
+             data: { "jobGroupId": row.jobGroup },
+             async: false,
+             dataType: "json",
+             success: function (data) {
+               if (data.code == 200) {
+                 var content = data.content;
+                 console.log(content);
+                 // 清空原来的
+                 updateExecutorHandler.empty();
+                 // 添加一个默认选中
+                 updateExecutorHandler.append("<option value='" + row.executorHandler + "'>" + row.executorHandler + "</option>");
+                 for (var i in content) {
+                   if(content[i] !== row.executorHandler){
+                     // 遍历输出 list 添加为 option                
+                     $("#executorHandlerSelectUpdate").append("<option value='" + content[i] + "'>" + content[i] + "</option>");
+                   }
+                 }
+               }
+             }
+           });
+    $('#updateModal .form select[name=executorHandler] option[value=' + row.executorHandler + ']').prop('selected', true);
     $("#updateModal .form textarea[name='executorParam']").val(row.executorParam);
     $("#updateModal .form input[name='childJobId']").val(row.childJobId);
     $('#updateModal .form select[name=executorBlockStrategy] option[value=' + row.executorBlockStrategy + ']').prop('selected', true);
     $('#updateModal .form select[name=glueType] option[value=' + row.glueType + ']').prop('selected', true);
-
     $("#updateModal .form select[name=glueType]").change();
-
-    // show
+    // 显示更新模态框
     $('#updateModal').modal({ backdrop: false, keyboard: false }).modal('show');
   });
   var updateModalValidate = $("#updateModal .form").validate({
@@ -538,6 +564,7 @@ $(function () {
                                                                  .val(executorFailRetryCount);
 
                                                                  // post
+                                                                 console.log($("#updateModal .form").serialize());
                                                                  $.post(base_url + "/jobinfo/update", $("#updateModal .form").serialize(),
                                                                         function (data, status) {
                                                                           if (data.code == "200") {
@@ -601,13 +628,13 @@ $(function () {
              success: function (data) {
                if (data.code == 200) {
                  var content = data.content;
-                 console.log(content);
+                 var executorHandlerSelect = $("#executorHandlerSelect");
                  // 清空原来的
-                 $("#executorHandlerSelect").empty();
-                 $("#executorHandlerSelect").append("<option value='defalut' selected>请选择 JobHandler</option>");
+                 executorHandlerSelect.empty();
+                 executorHandlerSelect.append("<option value='defalut' selected>请选择 JobHandler</option>");
                  for (var i in content) {
                    // 遍历输出 list 添加为 option                
-                   $("#executorHandlerSelect").append("<option value='" + content[i] + "'>" + content[i] + "</option>");
+                   executorHandlerSelect.append("<option value='" + content[i] + "'>" + content[i] + "</option>");
                  }
                }
              }
