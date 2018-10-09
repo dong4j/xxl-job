@@ -4,27 +4,32 @@ import com.xxl.job.admin.core.route.ExecutorRouter;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 单个JOB对应的每个执行器，使用频率最低的优先被选举
- *      a(*)、LFU(Least Frequently Used)：最不经常使用，频率/次数
- *      b、LRU(Least Recently Used)：最近最久未使用，时间
- *
+ * a(*)、LFU(Least Frequently Used)：最不经常使用，频率/次数
+ * b、LRU(Least Recently Used)：最近最久未使用，时间
  * Created by xuxueli on 17/3/10.
  */
 public class ExecutorRouteLFU extends ExecutorRouter {
 
-    private static ConcurrentHashMap<Integer, HashMap<String, Integer>> jobLfuMap = new ConcurrentHashMap<Integer, HashMap<String, Integer>>();
-    private static long CACHE_VALID_TIME = 0;
+    private static ConcurrentHashMap<Integer, HashMap<String, Integer>> jobLfuMap        = new ConcurrentHashMap<Integer, HashMap<String, Integer>>();
+    private static long                                                 CACHE_VALID_TIME = 0;
 
     public String route(int jobId, List<String> addressList) {
 
         // cache clear
         if (System.currentTimeMillis() > CACHE_VALID_TIME) {
             jobLfuMap.clear();
-            CACHE_VALID_TIME = System.currentTimeMillis() + 1000*60*60*24;
+            CACHE_VALID_TIME = System.currentTimeMillis() + 1000 * 60 * 60 * 24;
         }
 
         // lfu item init
@@ -33,8 +38,8 @@ public class ExecutorRouteLFU extends ExecutorRouter {
             lfuItemMap = new HashMap<String, Integer>();
             jobLfuMap.putIfAbsent(jobId, lfuItemMap);   // 避免重复覆盖
         }
-        for (String address: addressList) {
-            if (!lfuItemMap.containsKey(address) || lfuItemMap.get(address) >1000000 ) {
+        for (String address : addressList) {
+            if (!lfuItemMap.containsKey(address) || lfuItemMap.get(address) > 1000000) {
                 lfuItemMap.put(address, new Random().nextInt(addressList.size()));  // 初始化时主动Random一次，缓解首次压力
             }
         }
@@ -49,7 +54,7 @@ public class ExecutorRouteLFU extends ExecutorRouter {
         });
 
         Map.Entry<String, Integer> addressItem = lfuItemList.get(0);
-        String minAddress = addressItem.getKey();
+        String                     minAddress  = addressItem.getKey();
         addressItem.setValue(addressItem.getValue() + 1);
 
         return addressItem.getKey();

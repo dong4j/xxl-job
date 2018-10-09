@@ -15,8 +15,19 @@ import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.rpc.netcom.NetComClientProxy;
 import com.xxl.job.core.rpc.netcom.NetComServerFactory;
-import org.quartz.*;
+
+import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
+import org.quartz.Job;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * base quartz scheduler util
+ *
  * @author xuxueli 2015-12-19 16:13:53
  */
 public final class XxlJobDynamicScheduler implements ApplicationContextAware {
@@ -40,35 +52,66 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
 
     // scheduler
     private static Scheduler scheduler;
-    public void setScheduler(Scheduler scheduler) {
-		XxlJobDynamicScheduler.scheduler = scheduler;
-	}
 
-	// accessToken
-    private static String accessToken;
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    /**
+     * Sets scheduler.
+     *
+     * @param scheduler the scheduler
+     */
+    public void setScheduler(Scheduler scheduler) {
+        XxlJobDynamicScheduler.scheduler = scheduler;
     }
 
+    // accessToken
+    private static String accessToken;
+
+    /**
+     * Sets access token.
+     *
+     * @param accessToken the access token
+     */
+    public void setAccessToken(String accessToken) {
+        XxlJobDynamicScheduler.accessToken = accessToken;
+    }
+
+    /**
+     * The Xxl job log dao.
+     */
     // dao
-    public static XxlJobLogDao xxlJobLogDao;
-    public static XxlJobInfoDao xxlJobInfoDao;
+    public static XxlJobLogDao      xxlJobLogDao;
+    /**
+     * The Xxl job info dao.
+     */
+    public static XxlJobInfoDao     xxlJobInfoDao;
+    /**
+     * The constant xxlJobRegistryDao.
+     */
     public static XxlJobRegistryDao xxlJobRegistryDao;
-    public static XxlJobGroupDao xxlJobGroupDao;
-    public static AdminBiz adminBiz;
+    /**
+     * The Xxl job group dao.
+     */
+    public static XxlJobGroupDao    xxlJobGroupDao;
+    /**
+     * The Admin biz.
+     */
+    public static AdminBiz          adminBiz;
 
     // ---------------------- applicationContext ----------------------
     @Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		XxlJobDynamicScheduler.xxlJobLogDao = applicationContext.getBean(XxlJobLogDao.class);
-		XxlJobDynamicScheduler.xxlJobInfoDao = applicationContext.getBean(XxlJobInfoDao.class);
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        XxlJobDynamicScheduler.xxlJobLogDao = applicationContext.getBean(XxlJobLogDao.class);
+        XxlJobDynamicScheduler.xxlJobInfoDao = applicationContext.getBean(XxlJobInfoDao.class);
         XxlJobDynamicScheduler.xxlJobRegistryDao = applicationContext.getBean(XxlJobRegistryDao.class);
         XxlJobDynamicScheduler.xxlJobGroupDao = applicationContext.getBean(XxlJobGroupDao.class);
         XxlJobDynamicScheduler.adminBiz = applicationContext.getBean(AdminBiz.class);
-	}
+    }
 
+    /**
+     * Init.
+     *
+     */
     // ---------------------- init + destroy ----------------------
-    public void init() throws Exception {
+    public void init() {
         // admin registry monitor run
         JobRegistryMonitorHelper.getInstance().start();
 
@@ -87,13 +130,16 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         logger.info(">>>>>>>>> init xxl-job admin success.");
     }
 
-    private void initI18n(){
-        for (ExecutorBlockStrategyEnum item:ExecutorBlockStrategyEnum.values()) {
+    private void initI18n() {
+        for (ExecutorBlockStrategyEnum item : ExecutorBlockStrategyEnum.values()) {
             item.setTitle(I18nUtil.getString("jobconf_block_".concat(item.name())));
         }
     }
 
-    public void destroy(){
+    /**
+     * Destroy.
+     */
+    public void destroy() {
 
         // admin trigger pool stop
         JobTriggerPoolHelper.toStop();
@@ -107,9 +153,17 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
 
     // ---------------------- executor-client ----------------------
     private static ConcurrentHashMap<String, ExecutorBiz> executorBizRepository = new ConcurrentHashMap<String, ExecutorBiz>();
+
+    /**
+     * Gets executor biz.
+     *
+     * @param address the address
+     * @return the executor biz
+     * @throws Exception the exception
+     */
     public static ExecutorBiz getExecutorBiz(String address) throws Exception {
         // valid
-        if (address==null || address.trim().length()==0) {
+        if (address == null || address.trim().length() == 0) {
             return null;
         }
 
@@ -131,117 +185,117 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     /**
      * fill job info
      *
-     * @param jobInfo
+     * @param jobInfo the job info
      */
-	public static void fillJobInfo(XxlJobInfo jobInfo) {
-		// TriggerKey : name + group
-        String group = String.valueOf(jobInfo.getJobGroup());
-        String name = String.valueOf(jobInfo.getId());
+    public static void fillJobInfo(XxlJobInfo jobInfo) {
+        // TriggerKey : name + group
+        String     group      = String.valueOf(jobInfo.getJobGroup());
+        String     name       = String.valueOf(jobInfo.getId());
         TriggerKey triggerKey = TriggerKey.triggerKey(name, group);
 
         try {
-			Trigger trigger = scheduler.getTrigger(triggerKey);
+            Trigger trigger = scheduler.getTrigger(triggerKey);
 
-			TriggerState triggerState = scheduler.getTriggerState(triggerKey);
-			
-			// parse params
-			if (trigger!=null && trigger instanceof CronTriggerImpl) {
-				String cronExpression = ((CronTriggerImpl) trigger).getCronExpression();
-				jobInfo.setJobCron(cronExpression);
-			}
+            TriggerState triggerState = scheduler.getTriggerState(triggerKey);
 
-			//JobKey jobKey = new JobKey(jobInfo.getJobName(), String.valueOf(jobInfo.getJobGroup()));
+            // parse params
+            if (trigger != null && trigger instanceof CronTriggerImpl) {
+                String cronExpression = ((CronTriggerImpl) trigger).getCronExpression();
+                jobInfo.setJobCron(cronExpression);
+            }
+
+            //JobKey jobKey = new JobKey(jobInfo.getJobName(), String.valueOf(jobInfo.getJobGroup()));
             //JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             //String jobClass = jobDetail.getJobClass().getName();
 
-			if (triggerState!=null) {
-				jobInfo.setJobStatus(triggerState.name());
-			}
-			
-		} catch (SchedulerException e) {
-			logger.error(e.getMessage(), e);
-		}
-	}
-	
+            if (triggerState != null) {
+                jobInfo.setJobStatus(triggerState.name());
+            }
+
+        } catch (SchedulerException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
     /**
      * check if exists
      *
-     * @param jobName
-     * @param jobGroup
-     * @return
-     * @throws SchedulerException
+     * @param jobName  the job name
+     * @param jobGroup the job group
+     * @return boolean
+     * @throws SchedulerException the scheduler exception
      */
-	public static boolean checkExists(String jobName, String jobGroup) throws SchedulerException{
-		TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-		return scheduler.checkExists(triggerKey);
-	}
+    public static boolean checkExists(String jobName, String jobGroup) throws SchedulerException {
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+        return scheduler.checkExists(triggerKey);
+    }
 
     /**
      * addJob
      *
-     * @param jobName
-     * @param jobGroup
-     * @param cronExpression
-     * @return
-     * @throws SchedulerException
+     * @param jobName        the job name
+     * @param jobGroup       the job group
+     * @param cronExpression the cron expression
+     * @return boolean
+     * @throws SchedulerException the scheduler exception
      */
-	public static boolean addJob(String jobName, String jobGroup, String cronExpression) throws SchedulerException {
-    	// TriggerKey : name + group
+    public static boolean addJob(String jobName, String jobGroup, String cronExpression) throws SchedulerException {
+        // TriggerKey : name + group
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-        JobKey jobKey = new JobKey(jobName, jobGroup);
-        
+        JobKey     jobKey     = new JobKey(jobName, jobGroup);
+
         // TriggerKey valid if_exists
         if (checkExists(jobName, jobGroup)) {
             logger.info(">>>>>>>>> addJob fail, job already exist, jobGroup:{}, jobName:{}", jobGroup, jobName);
             return false;
         }
-        
+
         // CronTrigger : TriggerKey + cronExpression	// withMisfireHandlingInstructionDoNothing 忽略掉调度终止过程中忽略的调度
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing();
-        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
+        CronTrigger         cronTrigger         = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
 
         // JobDetail : jobClass
-		Class<? extends Job> jobClass_ = RemoteHttpJobBean.class;   // Class.forName(jobInfo.getJobClass());
-        
-		JobDetail jobDetail = JobBuilder.newJob(jobClass_).withIdentity(jobKey).build();
+        Class<? extends Job> jobClass_ = RemoteHttpJobBean.class;   // Class.forName(jobInfo.getJobClass());
+
+        JobDetail jobDetail = JobBuilder.newJob(jobClass_).withIdentity(jobKey).build();
         /*if (jobInfo.getJobData()!=null) {
         	JobDataMap jobDataMap = jobDetail.getJobDataMap();
         	jobDataMap.putAll(JacksonUtil.readValue(jobInfo.getJobData(), Map.class));	
         	// JobExecutionContext context.getMergedJobDataMap().get("mailGuid");
 		}*/
-        
+
         // schedule : jobDetail + cronTrigger
         Date date = scheduler.scheduleJob(jobDetail, cronTrigger);
 
         logger.info(">>>>>>>>>>> addJob success, jobDetail:{}, cronTrigger:{}, date:{}", jobDetail, cronTrigger, date);
         return true;
     }
-    
+
     /**
      * rescheduleJob
      *
-     * @param jobGroup
-     * @param jobName
-     * @param cronExpression
-     * @return
-     * @throws SchedulerException
+     * @param jobGroup       the job group
+     * @param jobName        the job name
+     * @param cronExpression the cron expression
+     * @return boolean
+     * @throws SchedulerException the scheduler exception
      */
-	public static boolean rescheduleJob(String jobGroup, String jobName, String cronExpression) throws SchedulerException {
-    	
-    	// TriggerKey valid if_exists
+    public static boolean rescheduleJob(String jobGroup, String jobName, String cronExpression) throws SchedulerException {
+
+        // TriggerKey valid if_exists
         if (!checkExists(jobName, jobGroup)) {
-        	logger.info(">>>>>>>>>>> rescheduleJob fail, job not exists, JobGroup:{}, JobName:{}", jobGroup, jobName);
+            logger.info(">>>>>>>>>>> rescheduleJob fail, job not exists, JobGroup:{}, JobName:{}", jobGroup, jobName);
             return false;
         }
-        
+
         // TriggerKey : name + group
-        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+        TriggerKey  triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
         CronTrigger oldTrigger = (CronTrigger) scheduler.getTrigger(triggerKey);
 
         if (oldTrigger != null) {
             // avoid repeat
             String oldCron = oldTrigger.getCronExpression();
-            if (oldCron.equals(cronExpression)){
+            if (oldCron.equals(cronExpression)) {
                 return true;
             }
 
@@ -254,10 +308,10 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         } else {
             // CronTrigger : TriggerKey + cronExpression
             CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing();
-            CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
+            CronTrigger         cronTrigger         = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
 
             // JobDetail-JobDataMap fresh
-            JobKey jobKey = new JobKey(jobName, jobGroup);
+            JobKey    jobKey    = new JobKey(jobName, jobGroup);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             /*JobDataMap jobDataMap = jobDetail.getJobDataMap();
             jobDataMap.clear();
@@ -273,19 +327,19 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         logger.info(">>>>>>>>>>> resumeJob success, JobGroup:{}, JobName:{}", jobGroup, jobName);
         return true;
     }
-    
+
     /**
      * unscheduleJob
      *
-     * @param jobName
-     * @param jobGroup
-     * @return
-     * @throws SchedulerException
+     * @param jobName  the job name
+     * @param jobGroup the job group
+     * @return boolean
+     * @throws SchedulerException the scheduler exception
      */
     public static boolean removeJob(String jobName, String jobGroup) throws SchedulerException {
-    	// TriggerKey : name + group
+        // TriggerKey : name + group
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-        boolean result = false;
+        boolean    result     = false;
         if (checkExists(jobName, jobGroup)) {
             result = scheduler.unscheduleJob(triggerKey);
             logger.info(">>>>>>>>>>> removeJob, triggerKey:{}, result [{}]", triggerKey, result);
@@ -296,68 +350,68 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     /**
      * pause
      *
-     * @param jobName
-     * @param jobGroup
-     * @return
-     * @throws SchedulerException
+     * @param jobName  the job name
+     * @param jobGroup the job group
+     * @return boolean
+     * @throws SchedulerException the scheduler exception
      */
     public static boolean pauseJob(String jobName, String jobGroup) throws SchedulerException {
-    	// TriggerKey : name + group
-    	TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-        
+        // TriggerKey : name + group
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+
         boolean result = false;
         if (checkExists(jobName, jobGroup)) {
             scheduler.pauseTrigger(triggerKey);
             result = true;
             logger.info(">>>>>>>>>>> pauseJob success, triggerKey:{}", triggerKey);
         } else {
-        	logger.info(">>>>>>>>>>> pauseJob fail, triggerKey:{}", triggerKey);
+            logger.info(">>>>>>>>>>> pauseJob fail, triggerKey:{}", triggerKey);
         }
         return result;
     }
-    
+
     /**
      * resume
      *
-     * @param jobName
-     * @param jobGroup
-     * @return
-     * @throws SchedulerException
+     * @param jobName  the job name
+     * @param jobGroup the job group
+     * @return boolean
+     * @throws SchedulerException the scheduler exception
      */
     public static boolean resumeJob(String jobName, String jobGroup) throws SchedulerException {
-    	// TriggerKey : name + group
-    	TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-        
+        // TriggerKey : name + group
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+
         boolean result = false;
         if (checkExists(jobName, jobGroup)) {
             scheduler.resumeTrigger(triggerKey);
             result = true;
             logger.info(">>>>>>>>>>> resumeJob success, triggerKey:{}", triggerKey);
         } else {
-        	logger.info(">>>>>>>>>>> resumeJob fail, triggerKey:{}", triggerKey);
+            logger.info(">>>>>>>>>>> resumeJob fail, triggerKey:{}", triggerKey);
         }
         return result;
     }
-    
+
     /**
      * run
      *
-     * @param jobName
-     * @param jobGroup
-     * @return
-     * @throws SchedulerException
+     * @param jobName  the job name
+     * @param jobGroup the job group
+     * @return boolean
+     * @throws SchedulerException the scheduler exception
      */
     public static boolean triggerJob(String jobName, String jobGroup) throws SchedulerException {
-    	// TriggerKey : name + group
-    	JobKey jobKey = new JobKey(jobName, jobGroup);
-        
+        // TriggerKey : name + group
+        JobKey jobKey = new JobKey(jobName, jobGroup);
+
         boolean result = false;
         if (checkExists(jobName, jobGroup)) {
             scheduler.triggerJob(jobKey);
             result = true;
             logger.info(">>>>>>>>>>> runJob success, jobKey:{}", jobKey);
         } else {
-        	logger.info(">>>>>>>>>>> runJob fail, jobKey:{}", jobKey);
+            logger.info(">>>>>>>>>>> runJob fail, jobKey:{}", jobKey);
         }
         return result;
     }

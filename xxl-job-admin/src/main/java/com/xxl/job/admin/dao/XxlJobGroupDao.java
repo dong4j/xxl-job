@@ -1,6 +1,7 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobGroup;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -10,15 +11,50 @@ import java.util.List;
  */
 public interface XxlJobGroupDao {
 
-    public List<XxlJobGroup> findAll();
+    /**
+     * Find all list.
+     *
+     * @return the list
+     */
+    List<XxlJobGroup> findAll();
 
-    public List<XxlJobGroup> findByAddressType(@Param("addressType") int addressType);
+    /**
+     * Find by address type list.
+     *
+     * @param addressType the address type
+     * @return the list
+     */
+    List<XxlJobGroup> findByAddressType(@Param("addressType") int addressType);
 
-    public int save(XxlJobGroup xxlJobGroup);
+    /**
+     * Save int.
+     *
+     * @param xxlJobGroup the xxl job group
+     * @return the int
+     */
+    int save(XxlJobGroup xxlJobGroup);
 
-    public int update(XxlJobGroup xxlJobGroup);
+    /**
+     * Update int.
+     *
+     * @param xxlJobGroup the xxl job group
+     * @return the int
+     */
+    int update(XxlJobGroup xxlJobGroup);
 
-    public int remove(@Param("id") int id);
+    /**
+     * Remove int.
+     *
+     * @param id the id
+     * @return the int
+     */
+    int remove(@Param("id") int id);
 
-    public XxlJobGroup load(@Param("id") int id);
+    /**
+     * Load xxl job group.
+     *
+     * @param id the id
+     * @return the xxl job group
+     */
+    XxlJobGroup load(@Param("id") int id);
 }

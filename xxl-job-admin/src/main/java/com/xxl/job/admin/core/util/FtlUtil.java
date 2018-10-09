@@ -12,13 +12,18 @@ import freemarker.template.TemplateHashModel;
  */
 public class FtlUtil {
 
-    private static BeansWrapper wrapper = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build();     //BeansWrapper.getDefaultInstance();
+    private static BeansWrapper wrapper = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build();
 
+    /**
+     * Generate static model template hash model.
+     *
+     * @param packageName the package name
+     * @return the template hash model
+     */
     public static TemplateHashModel generateStaticModel(String packageName) {
         try {
             TemplateHashModel staticModels = wrapper.getStaticModels();
-            TemplateHashModel fileStatics = (TemplateHashModel) staticModels.get(packageName);
-            return fileStatics;
+            return (TemplateHashModel) staticModels.get(packageName);
         } catch (Exception e) {
             e.printStackTrace();
         }

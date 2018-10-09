@@ -10,22 +10,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 单个JOB对应的每个执行器，最久为使用的优先被选举
- *      a、LFU(Least Frequently Used)：最不经常使用，频率/次数
- *      b(*)、LRU(Least Recently Used)：最近最久未使用，时间
- *
+ * a、LFU(Least Frequently Used)：最不经常使用，频率/次数
+ * b(*)、LRU(Least Recently Used)：最近最久未使用，时间
  * Created by xuxueli on 17/3/10.
  */
 public class ExecutorRouteLRU extends ExecutorRouter {
 
-    private static ConcurrentHashMap<Integer, LinkedHashMap<String, String>> jobLRUMap = new ConcurrentHashMap<Integer, LinkedHashMap<String, String>>();
-    private static long CACHE_VALID_TIME = 0;
+    private static ConcurrentHashMap<Integer, LinkedHashMap<String, String>> jobLRUMap        = new ConcurrentHashMap<Integer, LinkedHashMap<String, String>>();
+    private static long                                                      CACHE_VALID_TIME = 0;
 
     public String route(int jobId, List<String> addressList) {
 
         // cache clear
         if (System.currentTimeMillis() > CACHE_VALID_TIME) {
             jobLRUMap.clear();
-            CACHE_VALID_TIME = System.currentTimeMillis() + 1000*60*60*24;
+            CACHE_VALID_TIME = System.currentTimeMillis() + 1000 * 60 * 60 * 24;
         }
 
         // init lru
@@ -41,14 +40,14 @@ public class ExecutorRouteLRU extends ExecutorRouter {
         }
 
         // put
-        for (String address: addressList) {
+        for (String address : addressList) {
             if (!lruItem.containsKey(address)) {
                 lruItem.put(address, address);
             }
         }
 
         // load
-        String eldestKey = lruItem.entrySet().iterator().next().getKey();
+        String eldestKey   = lruItem.entrySet().iterator().next().getKey();
         String eldestValue = lruItem.get(eldestKey);
         return eldestValue;
     }

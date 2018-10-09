@@ -1,6 +1,7 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobRegistry;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -10,20 +11,56 @@ import java.util.List;
  */
 public interface XxlJobRegistryDao {
 
-    public int removeDead(@Param("timeout") int timeout);
+    /**
+     * Remove dead int.
+     *
+     * @param timeout the timeout
+     * @return the int
+     */
+    int removeDead(@Param("timeout") int timeout);
 
-    public List<XxlJobRegistry> findAll(@Param("timeout") int timeout);
+    /**
+     * Find all list.
+     *
+     * @param timeout the timeout
+     * @return the list
+     */
+    List<XxlJobRegistry> findAll(@Param("timeout") int timeout);
 
-    public int registryUpdate(@Param("registryGroup") String registryGroup,
-                              @Param("registryKey") String registryKey,
-                              @Param("registryValue") String registryValue);
+    /**
+     * Registry update int.
+     *
+     * @param registryGroup the registry group
+     * @param registryKey   the registry key
+     * @param registryValue the registry value
+     * @return the int
+     */
+    int registryUpdate(@Param("registryGroup") String registryGroup,
+                       @Param("registryKey") String registryKey,
+                       @Param("registryValue") String registryValue);
 
-    public int registrySave(@Param("registryGroup") String registryGroup,
-                            @Param("registryKey") String registryKey,
-                            @Param("registryValue") String registryValue);
+    /**
+     * Registry save int.
+     *
+     * @param registryGroup the registry group
+     * @param registryKey   the registry key
+     * @param registryValue the registry value
+     * @return the int
+     */
+    int registrySave(@Param("registryGroup") String registryGroup,
+                     @Param("registryKey") String registryKey,
+                     @Param("registryValue") String registryValue);
 
-    public int registryDelete(@Param("registryGroup") String registGroup,
-                          @Param("registryKey") String registryKey,
-                          @Param("registryValue") String registryValue);
+    /**
+     * Registry delete int.
+     *
+     * @param registGroup   the regist group
+     * @param registryKey   the registry key
+     * @param registryValue the registry value
+     * @return the int
+     */
+    int registryDelete(@Param("registryGroup") String registGroup,
+                       @Param("registryKey") String registryKey,
+                       @Param("registryValue") String registryValue);
 
 }
